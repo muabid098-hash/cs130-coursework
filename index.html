@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Info Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f2f5fa;
+      color: #182238;
+    }
+    section {
+      background: white;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 12px;
+    }
+    button {
+      padding: 12px 16px;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+    #output { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>Device Info Demo</h1>
+  <p>
+    This demo displays basic information about your
+    own device. No data is secretly transmitted.
+  </p>
+
+  <section>
+    <h3>Browser information</h3>
+    <p id="browser"></p>
+    <p id="screen"></p>
+    <p id="platform"></p>
+  </section>
+
+  <section>
+    <h3>Battery status</h3>
+    <button id="batteryBtn">Check battery</button>
+    <p id="battery">Not checked yet.</p>
+  </section>
+
+  <section>
+    <h3>Location (optional)</h3>
+    <button id="locationBtn">Share my location</button>
+    <p id="location">Location not requested.</p>
+  </section>
+
+  <script>
+    document.getElementById("browser").textContent =
+      "Browser: " + navigator.userAgent;
+
+    document.getElementById("screen").textContent =
+      "Screen: " + screen.width + " × " + screen.height;
+
+    document.getElementById("platform").textContent =
+      "Platform: " + (navigator.platform || "Not available");
+
+    document.getElementById("batteryBtn").onclick = async () => {
+      const output = document.getElementById("battery");
+
+      if (!navigator.getBattery) {
+        output.textContent =
+          "Battery information is not supported by this browser.";
+        return;
+      }
+
+      try {
+        const battery = await navigator.getBattery();
+        output.textContent =
+          "Charge: " + Math.round(battery.level * 100) + "%; " +
+          "Charging: " + (battery.charging ? "Yes" : "No");
+      } catch {
+        output.textContent = "Battery information unavailable.";
+      }
+    };
+
+    document.getElementById("locationBtn").onclick = () => {
+      const output = document.getElementById("location");
+
+      if (!navigator.geolocation) {
+        output.textContent = "Location is not supported.";
+        return;
+      }
+
+      output.textContent = "Waiting for your permission...";
+
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          output.textContent =
+            "Latitude: " + position.coords.latitude +
+            ", Longitude: " + position.coords.longitude;
+        },
+        error => {
+          output.textContent =
+            "Location unavailable or permission denied.";
+        }
+      );
+    };
+  </script>
+</body>
+</html>
